@@ -1,0 +1,5 @@
+model_checkpoint_path: "srcnn.model-4"
+all_model_checkpoint_paths: "srcnn.model-1"
+all_model_checkpoint_paths: "srcnn.model-2"
+all_model_checkpoint_paths: "srcnn.model-3"
+all_model_checkpoint_paths: "srcnn.model-4"
