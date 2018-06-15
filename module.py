@@ -24,13 +24,13 @@ def network(depth, rgb, reuse=False, dim1=56, dim2=12, sr_times=16, name='networ
         depth_mapping_resnet3 = build_mapping_resnet_block(depth_feature_resnet3, dim1, dim2, 'depth_mapping_resnet3')
         depth_feature_resnet4 = build_feature_resnet_block(depth_pool3, dim1, 'depth_feature_resnet4')
         depth_mapping_resnet4 = build_mapping_resnet_block(depth_feature_resnet4, dim1, dim2, 'depth_mapping_resnet4')
-        depth_deconv1 = deconv2d(depth_mapping_resnet4, dim1, fn='prelu', do_norm=do_norm,
+        depth_deconv1 = deconv2d(depth_mapping_resnet4, dim1,  do_norm=do_norm,
                                  name='depth_deconv1', name_bn='bn1', name_prelu='alpha1')
         depth_deconv1 = element_wise_linear_add(depth_deconv1, depth_mapping_resnet3, 'alpha1')
-        depth_deconv2 = deconv2d(depth_deconv1, dim1, fn='prelu', do_norm=do_norm,
+        depth_deconv2 = deconv2d(depth_deconv1, dim1,  do_norm=do_norm,
                                  name='depth_deconv2', name_bn='bn1', name_prelu='alpha1')
         depth_deconv2 = element_wise_linear_add(depth_deconv2, depth_mapping_resnet2, 'alpha2')
-        depth_deconv3 = deconv2d(depth_deconv2, dim1, fn='prelu', do_norm=do_norm,
+        depth_deconv3 = deconv2d(depth_deconv2, dim1,  do_norm=do_norm,
                                  name='depth_deconv3', name_bn='bn1', name_prelu='alpha1')
         depth_deconv3 = element_wise_linear_add(depth_deconv3, depth_mapping_resnet1, 'alpha3')
 
@@ -47,20 +47,20 @@ def network(depth, rgb, reuse=False, dim1=56, dim2=12, sr_times=16, name='networ
         rgb_pool3 = pool(rgb_feature_resnet3, 'pool3')
         rgb_feature_resnet4 = build_feature_resnet_block(rgb_pool3, dim1, 'rgb_feature_resnet4')
         rgb_mapping_resnet4 = build_mapping_resnet_block(rgb_feature_resnet4, dim1, dim2, 'rgb_mapping_resnet4')
-        rgb_deconv1 = deconv2d(rgb_mapping_resnet4, dim1, fn='prelu', do_norm=do_norm,
+        rgb_deconv1 = deconv2d(rgb_mapping_resnet4, dim1, do_norm=do_norm,
                                  name='rgb_deconv1', name_bn='bn1', name_prelu='alpha1')
         rgb_deconv1 = element_wise_linear_add(rgb_deconv1, rgb_mapping_resnet3, 'alpha4')
-        rgb_deconv2 = deconv2d(rgb_deconv1, dim1, fn='prelu', do_norm=do_norm,
+        rgb_deconv2 = deconv2d(rgb_deconv1, dim1,  do_norm=do_norm,
                                  name='rgb_deconv2', name_bn='bn1', name_prelu='alpha1')
         rgb_deconv2 = element_wise_linear_add(rgb_deconv2, rgb_mapping_resnet2, 'alpha5')
-        rgb_deconv3 = deconv2d(rgb_deconv2, dim1, fn='prelu', do_norm=do_norm,
+        rgb_deconv3 = deconv2d(rgb_deconv2, dim1,  do_norm=do_norm,
                                  name='rgb_deconv3', name_bn='bn1', name_prelu='alpha1')
         rgb_deconv3 = element_wise_linear_add(rgb_deconv3, rgb_mapping_resnet1, 'alpha6')
 
         out = tf.concat([depth_deconv3, rgb_deconv3], 3)
         out = conv2d(out, dim1, 3, 1, 0.02, fn='prelu', do_norm=do_norm,
                      name='out1', name_bn='bn1', name_prelu='alpha1')
-        out = conv2d(out, 1, 3, 1, 0.02, fn='prelu', do_norm=do_norm,
+        out = conv2d(out, 1, 3, 1, 0.02, do_norm=do_norm,
                      name='out2', name_bn='bn1', name_prelu='alpha1')
         out = tf.concat([depth, out], 3)
         out = PReLU(out, 'alpha7')
