@@ -22,7 +22,7 @@ parser.add_argument('--gpu_number',            type=str,     default='0')
 parser.add_argument('--SR_times',              type=int,     default=16)   # 超分辨率倍数
 parser.add_argument('--SR_times_dir',          type=str,     default='train_16x')
 parser.add_argument('--batch_size',            type=int,     default=16)
-parser.add_argument('--epoch',                 type=int,     default=10)
+parser.add_argument('--epoch',                 type=int,     default=16)
 parser.add_argument('--learning_rate',         type=int,     default=0.001)
 parser.add_argument('--continue_train',        type=bool,    default=False)
 parser.add_argument('--test_depth_dir',        type=str,     default='depth_16x')  # 测试深度图路径
