@@ -56,7 +56,7 @@ class srcnn(object):
         # loss
         self.mse_loss = mse_loss(self.hr_image, self.ground_image)
         self.gradient_loss = gradient_loss(self.hr_image, self.ground_image)
-        self.loss =  self.mse_loss + self.gradient_loss
+        self.loss = self.mse_loss + self.gradient_loss
 
         # learning rate decay
         self.lr_decay = tf.placeholder(tf.float32, [], name='lr_decay')
@@ -67,8 +67,8 @@ class srcnn(object):
         # print var name in trainable variables
         for var in t_vars: print(var.name)
         # optimize
-        self.optim = tf.train.AdamOptimizer(self.learning_rate * self.lr_decay, beta1=0.5).minimize(self.loss,
-                                                                                                    var_list=self.vars)
+        self.optim = tf.train.AdamOptimizer(self.learning_rate * self.lr_decay).minimize(self.loss,
+                                                                                         var_list=self.vars)
 
     def train(self):
         self.summary()
@@ -86,10 +86,14 @@ class srcnn(object):
         start_time = time.time()
         for epoch in range(self.epoch):
             print("epoch:{}".format(epoch + 1))
-            if epoch < 5:
+            # if epoch < 5:
+            #     lr_decay = 1.0
+            # else:
+            #     lr_decay = 1.0 - (epoch - 5)/5
+            if epoch == 0:
                 lr_decay = 1.0
             else:
-                lr_decay = 1.0 - (epoch - 5)/5
+                lr_decay = 0.8 * lr_decay
             for idx in range(batch_idexs):
                 depth_list = depth_file[idx * self.batch_size: (idx + 1) * self.batch_size]
                 rgb_list = rgb_file[idx * self.batch_size: (idx + 1) * self.batch_size]
@@ -99,7 +103,7 @@ class srcnn(object):
                                                    self.image_width, self.sr_times)
                 feed = {self.depth_image: depth, self.rgb_image: rgb, self.ground_image: ground, self.lr_decay: lr_decay}
                 _, global_loss, mse_l, gradient_l, summ = self.sess.run([self.optim, self.loss, self.mse_loss,
-                                                                        self.gradient_loss, self.sum], feed_dict=feed)
+                                                                         self.gradient_loss, self.sum], feed_dict=feed)
                 if idx % 100 == 0:
                     durarion = time.time() - start_time
                     start_time = time.time()
@@ -157,7 +161,7 @@ class srcnn(object):
         ckpt = tf.train.get_checkpoint_state(self.ckpt_dir)
         if ckpt and ckpt.model_checkpoint_path:
             ckpt_name = os.path.basename(ckpt.model_checkpoint_path)
-            # ckpt_name = 'srcnn.model-80000'
+            # ckpt_name = 'srcnn.model-10000'
             self.saver.restore(self.sess, os.path.join(self.ckpt_dir, ckpt_name))
             return True
         else:
